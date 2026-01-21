@@ -1,5 +1,4 @@
 // Game store - simple reactive store without runes
-console.log('[GameStore] Module loading');
 
 export interface GamePlayer {
   nickname: string;
@@ -66,4 +65,3 @@ class GameStore {
 }
 
 export const gameStore = new GameStore();
-console.log('[GameStore] Store created');

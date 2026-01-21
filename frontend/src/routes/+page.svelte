@@ -1,27 +1,19 @@
 <script lang="ts">
-  console.log('[Page] Script starting');
   import { goto } from '$app/navigation';
-  console.log('[Page] goto imported');
   import { wsClient } from '$lib/websocket';
-  console.log('[Page] wsClient imported');
   import { gameStore, type Game } from '$lib/stores/game';
-  console.log('[Page] gameStore imported');
 
-  console.log('[Page] About to declare state variables');
   let nickname = $state('');
   let savedNickname = $state<string | null>(null);
   let games = $state<Game[]>([]);
   let loading = $state(false);
   let error = $state('');
   let showNicknameInput = $state(true);
-  console.log('[Page] State variables declared');
 
   // Load nickname from localStorage on mount
   $effect(() => {
-    console.log('[Lobby] Effect running, checking localStorage');
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('6xpoker_nickname');
-      console.log('[Lobby] Stored nickname:', stored);
       if (stored) {
         savedNickname = stored;
         nickname = stored;
@@ -32,7 +24,6 @@
   });
 
   async function saveNickname() {
-    console.log('[Lobby] saveNickname called');
     const trimmed = nickname.trim().toLowerCase();
     if (!trimmed) {
       error = 'Please enter a nickname';
@@ -46,7 +37,6 @@
     savedNickname = trimmed;
     showNicknameInput = false;
     error = '';
-    console.log('[Lobby] Nickname saved:', trimmed);
     await connectToLobby();
   }
 
@@ -55,34 +45,28 @@
   }
 
   async function connectToLobby() {
-    console.log('[Lobby] connectToLobby called');
     try {
       await wsClient.connect('/ws/lobby');
-      console.log('[Lobby] WebSocket connected');
       wsClient.on('lobby_update', (msg) => {
-        console.log('[Lobby] Received lobby_update:', msg.payload);
         games = msg.payload.games;
       });
       await fetchGames();
     } catch (e) {
-      console.error('[Lobby] Failed to connect to lobby:', e);
+      console.error('Failed to connect to lobby:', e);
     }
   }
 
   async function fetchGames() {
-    console.log('[Lobby] fetchGames called');
     try {
       const response = await fetch('/api/games');
       const data = await response.json();
-      console.log('[Lobby] Fetched games:', data);
       games = data.games;
     } catch (e) {
-      console.error('[Lobby] Failed to fetch games:', e);
+      console.error('Failed to fetch games:', e);
     }
   }
 
   async function createGame() {
-    console.log('[Lobby] createGame called');
     if (!savedNickname) return;
 
     loading = true;
@@ -97,17 +81,14 @@
 
       if (!response.ok) {
         const data = await response.json();
-        console.error('[Lobby] Create game failed:', data);
         error = data.detail || 'Failed to create game';
         return;
       }
 
       const data = await response.json();
-      console.log('[Lobby] Game created:', data);
       gameStore.currentGame = data.game;
       goto(`/game/${data.game.id}`);
     } catch (e) {
-      console.error('[Lobby] Create game error:', e);
       error = 'Failed to create game';
     } finally {
       loading = false;
