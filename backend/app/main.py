@@ -80,7 +80,22 @@ async def game_websocket(websocket: WebSocket, game_id: str, nickname: str):
 # Serve static files from frontend build
 static_dir = Path(__file__).parent.parent.parent / "frontend" / "build"
 if static_dir.exists():
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+    # Mount static files for assets (js, css, etc.)
+    app.mount("/_app", StaticFiles(directory=static_dir / "_app"), name="app_assets")
+
+    # Serve index.html for all non-API routes (SPA fallback)
+    @app.get("/{path:path}")
+    async def serve_spa(path: str):
+        # Try to serve the exact file first
+        file_path = static_dir / path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        # Fallback to index.html for client-side routing
+        return FileResponse(static_dir / "index.html")
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(static_dir / "index.html")
 else:
     @app.get("/")
     async def root():
