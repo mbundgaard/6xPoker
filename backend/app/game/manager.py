@@ -60,7 +60,7 @@ class GameManager:
             return None, f"Need at least {MIN_PLAYERS} players to start"
 
         game.status = GameStatus.ACTIVE
-        game.current_hand = 1
+        game.current_hand_num = 1
         return game, None
 
     def list_waiting_games(self) -> list[Game]:

@@ -79,12 +79,56 @@ This document tracks the implementation progress of each phase.
 ---
 
 ## Phase 4: Poker Core Logic
-**Status:** In Progress
+**Status:** Complete
 **Date:** 2026-01-21
 
-### Planned Changes
-- Create `backend/app/game/poker.py` - Card, Deck, hand evaluation
-- Implement hand ranking (high card through straight flush)
-- Create tests for hand evaluation
+### Changes Made
+- Created `backend/app/game/poker.py`:
+  - Card, Suit, Rank enums and dataclasses
+  - Deck class with shuffle and deal methods
+  - HandRank enum for all poker hands
+  - HandResult class with comparison operators
+  - `evaluate_five_cards()` - Evaluate exactly 5 cards
+  - `evaluate_hand()` - Find best 5 from 7 cards
+  - `compare_hands()` - Determine winner(s) with tie support
+- Supports all hands: high card through straight flush
+- Wheel straight (A-2-3-4-5) supported
+- Created `backend/tests/test_poker.py` with 17 comprehensive tests
+
+### Validation
+- Local: All 17 poker tests pass
+- Render: Deployed successfully, health check passes
+
+### Commits
+- `67e8d67` - Add poker core logic (Phase 4)
+
+---
+
+## Phase 5: Betting & Actions
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Updated `backend/app/game/models.py`:
+  - Added `BettingRound` enum (preflop, flop, turn, river, showdown)
+  - Added `PlayerHand` dataclass (hole cards, bets, folded, all-in)
+  - Added `Pot` dataclass (amount, eligible players)
+  - Added `Hand` dataclass (community cards, pots, betting state)
+  - Updated `Game` with active_hand, dealer_position, elimination_order
+- Created `backend/app/game/actions.py`:
+  - `fold()` - Player folds
+  - `check()` - Player checks (no bet to call)
+  - `call()` - Player calls current bet
+  - `raise_bet()` - Player raises with validation
+  - `all_in()` - Player goes all-in
+  - `get_valid_actions()` - Returns valid actions for a player
+  - `advance_action()` - Move to next player or round
+  - `collect_bets_into_pot()` - Pot management
+
+### Validation
+- Local: Action logic tested with mock game state
+
+### Commits
+- (pending)
 
 ---
