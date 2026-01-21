@@ -127,6 +127,37 @@ This document tracks the implementation progress of each phase.
 
 ### Validation
 - Local: Action logic tested with mock game state
+- Render: Deployed successfully
+
+### Commits
+- `05820ab` - Add betting and actions system (Phase 5)
+
+---
+
+## Phase 6: Full Game Loop
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Created `backend/app/game/game_loop.py`:
+  - `GameLoop` class manages entire hand lifecycle
+  - `start_game()` - Initialize game and start first hand
+  - `start_hand()` - Deal cards, post blinds, setup hand state
+  - `post_blinds()` - Handle SB/BB posting with heads-up rules
+  - `prompt_current_player()` - Send turn notification with valid actions
+  - `turn_timeout()` - Auto-fold after TURN_TIMER_SECONDS
+  - `handle_action()` - Process player actions via actions module
+  - `deal_community_cards()` - Deal flop/turn/river
+  - `resolve_hand()` - Determine winners, award pots
+  - `check_eliminations()` - Track eliminated players
+  - `end_game()` - Calculate placements, save to database
+- Updated `websocket.py`:
+  - `game_broadcast()` - Callback for game loop to send messages
+  - `handle_game_message()` - Creates game loop on start, routes actions
+- WebSocket events: `hand_started`, `blinds_posted`, `turn`, `player_action`, `community_cards`, `hand_result`, `player_eliminated`, `game_ended`
+
+### Validation
+- Local: All imports verified, game loop creation tested
 
 ### Commits
 - (pending)

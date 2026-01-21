@@ -101,8 +101,20 @@ class ConnectionManager:
 connection_manager = ConnectionManager()
 
 
+async def game_broadcast(game_id: str, message: dict, viewer_nickname: Optional[str] = None):
+    """Broadcast callback for game loop - sends to specific player or all players."""
+    if viewer_nickname:
+        # Send only to specific player
+        await connection_manager.send_to_player(game_id, viewer_nickname, message)
+    else:
+        # Broadcast to all players in game
+        await connection_manager.broadcast_to_game(game_id, message)
+
+
 async def handle_game_message(game_id: str, nickname: str, message: dict):
     """Process a message from a player in a game."""
+    from ..game.game_loop import get_game_loop, create_game_loop
+
     msg_type = message.get("type")
 
     if msg_type == "start_game":
@@ -113,14 +125,6 @@ async def handle_game_message(game_id: str, nickname: str, message: dict):
                 "payload": {"message": error}
             })
         else:
-            # Notify all players the game started
-            await connection_manager.broadcast_to_game(game_id, {
-                "type": "game_started",
-                "payload": {
-                    "game": game.to_dict(),
-                    "message": "Game has started!"
-                }
-            })
             # Notify lobby that game is no longer available
             await connection_manager.broadcast_to_lobby({
                 "type": "lobby_update",
@@ -129,12 +133,30 @@ async def handle_game_message(game_id: str, nickname: str, message: dict):
                 }
             })
 
+            # Create and start game loop
+            loop = create_game_loop(game, game_broadcast)
+            await loop.start_game()
+
     elif msg_type == "action":
-        # Will be implemented in Phase 5/6
-        await connection_manager.send_to_player(game_id, nickname, {
-            "type": "error",
-            "payload": {"message": "Game actions not yet implemented"}
-        })
+        loop = get_game_loop(game_id)
+        if not loop:
+            await connection_manager.send_to_player(game_id, nickname, {
+                "type": "error",
+                "payload": {"message": "Game not active"}
+            })
+            return
+
+        action_type = message.get("action")
+        params = message.get("params", {})
+
+        if not action_type:
+            await connection_manager.send_to_player(game_id, nickname, {
+                "type": "error",
+                "payload": {"message": "No action specified"}
+            })
+            return
+
+        await loop.handle_action(nickname, action_type, params)
 
     else:
         await connection_manager.send_to_player(game_id, nickname, {
