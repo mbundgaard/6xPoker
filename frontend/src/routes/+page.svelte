@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { wsClient } from '$lib/websocket';
-  import { gameStore, type Game } from '$lib/stores/game';
+  import { gameStore, type Game } from '$lib/stores/game.svelte';
 
   let nickname = $state('');
   let savedNickname = $state<string | null>(null);

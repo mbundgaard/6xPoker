@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
   import { wsClient } from '$lib/websocket';
-  import { gameStore, type Game, type GamePlayer } from '$lib/stores/game';
+  import { gameStore, type Game, type GamePlayer } from '$lib/stores/game.svelte';
   import Card from '$lib/components/Card.svelte';
   import PlayerSeat from '$lib/components/PlayerSeat.svelte';
   import ActionButtons from '$lib/components/ActionButtons.svelte';
