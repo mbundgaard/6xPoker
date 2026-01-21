@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 
 from .db import connect_db, disconnect_db, create_tables, database
+from .api import router
 
 
 @asynccontextmanager
@@ -20,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(router)
 
 # Store connected websocket clients
 connected_clients: list[WebSocket] = []
