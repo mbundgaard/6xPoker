@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#1a1a2e"/>
+  <text x="256" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="#e94560">6x</text>
+  <g transform="translate(128, 220)">
+    <!-- Spade symbol -->
+    <path d="M128 0 C128 0 40 80 40 140 C40 180 70 200 100 200 C100 200 90 240 70 260 L186 260 C166 240 156 200 156 200 C186 200 216 180 216 140 C216 80 128 0 128 0 Z" fill="#e94560"/>
+  </g>
+</svg>

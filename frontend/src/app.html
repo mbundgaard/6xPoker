@@ -2,11 +2,34 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 		<title>6x Poker</title>
+
+		<!-- PWA Meta Tags -->
+		<meta name="description" content="Multiplayer No-Limit Texas Hold'em Poker" />
+		<meta name="theme-color" content="#e94560" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="6x Poker" />
+
+		<!-- PWA Manifest -->
+		<link rel="manifest" href="/manifest.json" />
+
+		<!-- Icons -->
+		<link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+		<link rel="apple-touch-icon" href="/icons/icon.svg" />
+
 		%sveltekit.head%
 	</head>
 	<body>
 		<div>%sveltekit.body%</div>
+		<script>
+			// Register service worker for PWA
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/sw.js').catch((err) => {
+					console.log('Service worker registration failed:', err);
+				});
+			}
+		</script>
 	</body>
 </html>
