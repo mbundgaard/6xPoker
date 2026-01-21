@@ -1,10 +1,25 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 import json
 
-app = FastAPI()
+from .db import connect_db, disconnect_db, create_tables, database
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    await connect_db()
+    if database:
+        await create_tables()
+    yield
+    # Shutdown
+    await disconnect_db()
+
+
+app = FastAPI(lifespan=lifespan)
 
 # Store connected websocket clients
 connected_clients: list[WebSocket] = []
@@ -12,7 +27,8 @@ connected_clients: list[WebSocket] = []
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok", "message": "Backend is running"}
+    db_status = "connected" if database and database.is_connected else "not connected"
+    return {"status": "ok", "message": "Backend is running", "database": db_status}
 
 
 @app.websocket("/ws")
