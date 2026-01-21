@@ -9,17 +9,22 @@ class WebSocketClient {
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
   private url: string | null = null;
+  private _connectionState: 'disconnected' | 'connecting' | 'connected' = 'disconnected';
 
   connect(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       this.url = `${protocol}//${window.location.host}${path}`;
+      this._connectionState = 'connecting';
+      this.emit('connection_state', { type: 'connection_state', state: 'connecting' });
 
       try {
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
           this.reconnectAttempts = 0;
+          this._connectionState = 'connected';
+          this.emit('connection_state', { type: 'connection_state', state: 'connected' });
           resolve();
         };
 
@@ -33,14 +38,18 @@ class WebSocketClient {
         };
 
         this.ws.onclose = () => {
+          this._connectionState = 'disconnected';
+          this.emit('connection_state', { type: 'connection_state', state: 'disconnected' });
           this.emit('disconnect', { type: 'disconnect' });
           this.attemptReconnect();
         };
 
         this.ws.onerror = (error) => {
+          this._connectionState = 'disconnected';
           reject(error);
         };
       } catch (error) {
+        this._connectionState = 'disconnected';
         reject(error);
       }
     });
@@ -105,6 +114,14 @@ class WebSocketClient {
 
   get isConnected() {
     return this.ws?.readyState === WebSocket.OPEN;
+  }
+
+  get connectionState() {
+    return this._connectionState;
+  }
+
+  clearHandlers() {
+    this.handlers.clear();
   }
 }
 

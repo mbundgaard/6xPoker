@@ -218,3 +218,71 @@ This document tracks the implementation progress of each phase.
 - `69e5abc` - Fix SPA routing for frontend
 
 ---
+
+## Phase 9: Frontend - Game Table
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Created game components in `frontend/src/lib/components/`:
+  - `Card.svelte` - Playing card with suit symbols and rank display
+  - `Timer.svelte` - Turn countdown with color-coded urgency
+  - `PlayerSeat.svelte` - Player info, chips, cards, dealer button
+  - `ActionButtons.svelte` - Fold, check, call, raise with slider
+  - `PotDisplay.svelte` - Main pot and side pots
+  - `CommunityCards.svelte` - Board cards with placeholders
+- Created `frontend/src/routes/game/[id]/+page.svelte`:
+  - WebSocket connection to game channel
+  - Waiting room UI with player list and start button
+  - Game table layout with 4 player positions
+  - Real-time updates for all game events
+  - Hand result overlay showing winners
+  - Game over screen with final standings
+
+### WebSocket Events Handled
+- `game_joined`, `player_joined`, `player_connected`, `player_disconnected`
+- `game_started`, `hand_started`, `blinds_posted`
+- `turn`, `player_action`, `community_cards`
+- `hand_result`, `player_eliminated`, `game_ended`
+
+### Validation
+- Render: Game page loads at `/game/{id}`
+- SPA routing works for dynamic routes
+
+### Commits
+- `34e0079` - Add frontend game table (Phase 9)
+
+---
+
+## Phase 10: PWA Features
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Created `frontend/static/manifest.json`:
+  - App name, description, theme colors
+  - SVG icons for all sizes
+  - Standalone display mode
+  - Portrait orientation
+- Created `frontend/static/icons/icon.svg`:
+  - "6x" text with spade symbol
+  - Dark background with red accent
+- Created `frontend/static/sw.js`:
+  - Network-first caching strategy
+  - Excludes WebSocket and API requests
+  - Offline fallback to cached content
+- Updated `frontend/src/app.html`:
+  - PWA meta tags (theme-color, apple-mobile-web-app)
+  - Manifest link
+  - Service worker registration
+
+### Validation
+- Render: All PWA assets served correctly
+  - `/manifest.json` - Valid manifest
+  - `/sw.js` - Service worker loads
+  - `/icons/icon.svg` - Icon renders
+
+### Commits
+- `c9a7a92` - Add PWA features (Phase 10)
+
+---
