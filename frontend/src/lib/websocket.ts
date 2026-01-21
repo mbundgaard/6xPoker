@@ -1,4 +1,5 @@
 // WebSocket client for game communication
+console.log('[WebSocket] Module loading');
 
 export type MessageHandler = (message: any) => void;
 
@@ -126,3 +127,4 @@ class WebSocketClient {
 }
 
 export const wsClient = new WebSocketClient();
+console.log('[WebSocket] Client created');

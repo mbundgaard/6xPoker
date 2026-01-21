@@ -1,14 +1,20 @@
 <script lang="ts">
+  console.log('[Page] Script starting');
   import { goto } from '$app/navigation';
+  console.log('[Page] goto imported');
   import { wsClient } from '$lib/websocket';
+  console.log('[Page] wsClient imported');
   import { gameStore, type Game } from '$lib/stores/game';
+  console.log('[Page] gameStore imported');
 
+  console.log('[Page] About to declare state variables');
   let nickname = $state('');
   let savedNickname = $state<string | null>(null);
   let games = $state<Game[]>([]);
   let loading = $state(false);
   let error = $state('');
   let showNicknameInput = $state(true);
+  console.log('[Page] State variables declared');
 
   // Load nickname from localStorage on mount
   $effect(() => {
