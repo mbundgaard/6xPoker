@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 
 from ..game import game_manager
+from ..db import get_leaderboard
 from .websocket import connection_manager
 
 router = APIRouter(prefix="/api")
@@ -79,3 +80,10 @@ async def join_game(game_id: str, request: JoinGameRequest, background_tasks: Ba
     background_tasks.add_task(notify_game_players)
 
     return {"game": game.to_dict()}
+
+
+@router.get("/leaderboard")
+async def leaderboard(limit: int = 100):
+    """Get all-time leaderboard rankings."""
+    results = await get_leaderboard(limit=limit)
+    return {"leaderboard": results}

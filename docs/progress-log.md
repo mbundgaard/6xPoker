@@ -160,6 +160,23 @@ This document tracks the implementation progress of each phase.
 - Local: All imports verified, game loop creation tested
 
 ### Commits
+- `95b0436` - Add full game loop (Phase 6)
+
+---
+
+## Phase 7: Leaderboard
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Added `GET /api/leaderboard` endpoint to `routes.py`
+- Returns all-time rankings: nickname, total_points, games_played
+- Query was already implemented in `db/queries.py`
+
+### Validation
+- Local: Imports verified
+
+### Commits
 - (pending)
 
 ---
