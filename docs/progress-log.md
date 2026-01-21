@@ -175,8 +175,46 @@ This document tracks the implementation progress of each phase.
 
 ### Validation
 - Local: Imports verified
+- Render: API endpoint returns `{"leaderboard": []}`
 
 ### Commits
-- (pending)
+- `bd324bf` - Add leaderboard endpoint (Phase 7)
+
+---
+
+## Phase 8: Frontend - Lobby
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Created `frontend/src/lib/stores/player.ts` - Nickname management with localStorage
+- Created `frontend/src/lib/stores/game.ts` - Game state store using Svelte 5 runes
+- Created `frontend/src/lib/websocket.ts` - WebSocket client with reconnection logic
+- Updated `frontend/src/routes/+page.svelte` - Complete lobby UI:
+  - Nickname input with validation
+  - Create game button
+  - List of open games with join buttons
+  - Real-time updates via WebSocket
+  - Link to leaderboard
+- Created `frontend/src/routes/leaderboard/+page.svelte` - Leaderboard page:
+  - Fetches rankings from API
+  - Displays top players with medals
+  - Back link to lobby
+- Fixed `backend/app/main.py` for SPA routing:
+  - Changed static file serving to handle client-side routes
+  - Mount /_app assets separately
+  - Fallback to index.html for unknown paths
+
+### Validation
+- Render: All pages load correctly
+  - `/` - Lobby page (SvelteKit renders via JS)
+  - `/leaderboard` - Leaderboard page works
+  - `/api/games` - Returns `{"games": []}`
+  - `/api/leaderboard` - Returns `{"leaderboard": []}`
+  - `/api/health` - Database connected
+
+### Commits
+- `721b99f` - Add frontend lobby system (Phase 8)
+- `69e5abc` - Fix SPA routing for frontend
 
 ---
