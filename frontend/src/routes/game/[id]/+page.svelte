@@ -44,6 +44,9 @@
 
   async function connectToGame() {
     try {
+      // Clear any existing handlers from previous pages
+      wsClient.clearHandlers();
+
       await wsClient.connect(`/ws/game/${gameId}?nickname=${nickname}`);
       connected = true;
 
