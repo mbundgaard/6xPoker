@@ -47,10 +47,8 @@
       // Clear any existing handlers from previous pages
       wsClient.clearHandlers();
 
-      await wsClient.connect(`/ws/game/${gameId}?nickname=${nickname}`);
-      connected = true;
-
-      // Set up message handlers
+      // Set up message handlers BEFORE connecting
+      // (server sends game_joined immediately on connect)
       wsClient.on('game_joined', (msg) => {
         game = msg.payload.game;
         gameStore.currentGame = game;
@@ -139,6 +137,10 @@
       wsClient.on('disconnect', () => {
         connected = false;
       });
+
+      // Connect after handlers are set up
+      await wsClient.connect(`/ws/game/${gameId}?nickname=${nickname}`);
+      connected = true;
     } catch (e) {
       console.error('Failed to connect:', e);
       error = 'Failed to connect to game';

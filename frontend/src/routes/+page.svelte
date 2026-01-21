@@ -49,10 +49,12 @@
       // Clear any existing handlers from previous pages
       wsClient.clearHandlers();
 
-      await wsClient.connect('/ws/lobby');
+      // Set up handlers BEFORE connecting
       wsClient.on('lobby_update', (msg) => {
         games = msg.payload.games;
       });
+
+      await wsClient.connect('/ws/lobby');
       await fetchGames();
     } catch (e) {
       console.error('Failed to connect to lobby:', e);
