@@ -54,13 +54,37 @@ This document tracks the implementation progress of each phase.
 ---
 
 ## Phase 3: WebSocket Game Connection
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Created `backend/app/api/websocket.py` with ConnectionManager class
+- WebSocket endpoints:
+  - `/ws/lobby` - Subscribe to lobby updates (game list changes)
+  - `/ws/game/{game_id}?nickname={nickname}` - Join game channel
+- Message protocol (JSON with type/payload):
+  - Server → Client: `game_joined`, `player_joined`, `player_connected`, `player_disconnected`, `game_started`, `lobby_update`, `error`
+  - Client → Server: `start_game`, `action` (placeholder)
+- Routes broadcast lobby updates on game create/join
+- Game WebSocket sends current state on connect
+
+### Validation
+- Local: All imports and manager methods verified
+- Render: WebSocket connection tested via Python websockets library
+  - Connected to game, received `game_joined` message with game state
+
+### Commits
+- `46d2963` - Add WebSocket game connection (Phase 3)
+
+---
+
+## Phase 4: Poker Core Logic
 **Status:** In Progress
 **Date:** 2026-01-21
 
 ### Planned Changes
-- Create `backend/app/api/websocket.py` - WebSocket handler for games
-- Define message protocol (JSON with type/payload)
-- Implement lobby broadcasts and game events
-- Handle player connections/disconnections
+- Create `backend/app/game/poker.py` - Card, Deck, hand evaluation
+- Implement hand ranking (high card through straight flush)
+- Create tests for hand evaluation
 
 ---
