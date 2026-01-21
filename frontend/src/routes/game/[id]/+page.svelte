@@ -55,8 +55,11 @@
 
       wsClient.on('player_joined', (msg) => {
         if (game) {
-          game.players = msg.payload.players;
-          game.player_count = msg.payload.players.length;
+          game = {
+            ...game,
+            players: msg.payload.players,
+            player_count: msg.payload.players.length
+          };
         }
       });
 
