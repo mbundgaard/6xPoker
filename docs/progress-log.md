@@ -29,18 +29,38 @@ This document tracks the implementation progress of each phase.
 ---
 
 ## Phase 2: Lobby System (REST API)
+**Status:** Complete
+**Date:** 2026-01-21
+
+### Changes Made
+- Created `backend/app/game/models.py` - Game, GamePlayer dataclasses with GameStatus enum
+- Created `backend/app/game/manager.py` - GameManager singleton for in-memory game state
+- Created `backend/app/api/routes.py` - REST endpoints with Pydantic request models
+- Registered API router in `main.py`
+
+### Endpoints
+- `GET /api/games` - List waiting games
+- `POST /api/games` - Create game (body: `{nickname}`)
+- `GET /api/games/{id}` - Get game details
+- `POST /api/games/{id}/join` - Join game (body: `{nickname}`)
+
+### Validation
+- Local: Game creation, joining, listing, and start validation all tested
+- Render: All endpoints verified working via curl
+
+### Commits
+- `89b1645` - Add lobby system REST API (Phase 2)
+
+---
+
+## Phase 3: WebSocket Game Connection
 **Status:** In Progress
 **Date:** 2026-01-21
 
 ### Planned Changes
-- Create `backend/app/game/models.py` - Game and GamePlayer dataclasses
-- Create `backend/app/game/manager.py` - GameManager for in-memory state
-- Create `backend/app/api/routes.py` - REST endpoints for lobby
-- Register routes in `main.py`
-
-### Endpoints
-- `GET /api/games` - List waiting games
-- `POST /api/games` - Create game
-- `POST /api/games/{id}/join` - Join game
+- Create `backend/app/api/websocket.py` - WebSocket handler for games
+- Define message protocol (JSON with type/payload)
+- Implement lobby broadcasts and game events
+- Handle player connections/disconnections
 
 ---

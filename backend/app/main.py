@@ -6,7 +6,7 @@ from pathlib import Path
 import json
 
 from .db import connect_db, disconnect_db, create_tables, database
-from .api import router
+from .api import router, connection_manager, handle_game_message
 
 
 @asynccontextmanager
@@ -23,29 +23,58 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(router)
 
-# Store connected websocket clients
-connected_clients: list[WebSocket] = []
-
-
 @app.get("/api/health")
 async def health_check():
     db_status = "connected" if database and database.is_connected else "not connected"
     return {"status": "ok", "message": "Backend is running", "database": db_status}
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    connected_clients.append(websocket)
+@app.websocket("/ws/lobby")
+async def lobby_websocket(websocket: WebSocket):
+    """WebSocket for lobby updates (game list changes)."""
+    await connection_manager.connect_to_lobby(websocket)
+    try:
+        while True:
+            # Lobby connections just receive updates, no messages expected
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        connection_manager.disconnect_from_lobby(websocket)
+
+
+@app.websocket("/ws/game/{game_id}")
+async def game_websocket(websocket: WebSocket, game_id: str, nickname: str):
+    """WebSocket for game communication."""
+    error = await connection_manager.connect_to_game(websocket, game_id, nickname)
+    if error:
+        await websocket.close(code=4000, reason=error)
+        return
+
+    # Send current game state on connect
+    from .game import game_manager
+    game = game_manager.get_game(game_id)
+    if game:
+        await websocket.send_text(json.dumps({
+            "type": "game_joined",
+            "payload": {"game": game.to_dict()}
+        }))
+        # Notify others that player connected
+        await connection_manager.broadcast_to_game(game_id, {
+            "type": "player_connected",
+            "payload": {"nickname": nickname}
+        }, exclude_nickname=nickname)
+
     try:
         while True:
             data = await websocket.receive_text()
             message = json.loads(data)
-            # Echo back with server acknowledgment
-            response = {"type": "echo", "received": message}
-            await websocket.send_text(json.dumps(response))
+            await handle_game_message(game_id, nickname, message)
     except WebSocketDisconnect:
-        connected_clients.remove(websocket)
+        connection_manager.disconnect_from_game(game_id, nickname)
+        # Notify others that player disconnected
+        await connection_manager.broadcast_to_game(game_id, {
+            "type": "player_disconnected",
+            "payload": {"nickname": nickname}
+        })
 
 
 # Serve static files from frontend build
